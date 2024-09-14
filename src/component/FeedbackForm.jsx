@@ -15,6 +15,7 @@ function FeedbackForm() {
 
   let [list, setList] = useState([]);
   let [editIndex, setEditIndex] = useState(null);
+  let [errors, setErrors] = useState({});
 
   useEffect(() => {
     let oldData = JSON.parse(localStorage.getItem('user')) || [];
@@ -23,6 +24,7 @@ function FeedbackForm() {
     //   localStorage.clear()
     // })
   }, []);
+
 
   let handleInput = (e) => {
     let { name, value, type, checked } = e.target;
@@ -45,8 +47,30 @@ function FeedbackForm() {
     setUser({ ...user, [type]: rating });
   };
 
+  let validateForm = () => {
+    let tempErrors = {};
+    if (!user.fname) tempErrors.fname = "First Name is required";
+    if (!user.lname) tempErrors.lname = "Last Name is required";
+
+    if (!user.email) tempErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(user.email)) tempErrors.email = "Email is invalid";
+
+    if (!user.hobby.length) tempErrors.hobby = "At least one hobby must be selected.";
+
+    if (!user.phn) tempErrors.phn = "Phone no. is required";
+    else if (user.phn && !/^\d+$/.test(user.phn)) { tempErrors.phn = "Phone number must contain only digits."; }
+
+    if (!user.feedback) tempErrors.feedback = "Feedback is required";
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  }
+
   let handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     if (editIndex !== -1) {
       let updatedList = list.map((item, index) =>
         index === editIndex ? user : item
