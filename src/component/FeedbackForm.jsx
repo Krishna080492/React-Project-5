@@ -11,9 +11,10 @@ import Table from 'react-bootstrap/Table';
 function FeedbackForm() {
   let [user, setUser] = useState({
     fname: '', lname: '', email: '', phn: '', source: '', hobby: [], rate: '', feedback: ''
-  });         // Initialize hobbies as array
+  });
 
   let [list, setList] = useState([]);
+  let [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
     let oldData = JSON.parse(localStorage.getItem('user')) || [];
@@ -35,7 +36,7 @@ function FeedbackForm() {
       }
       setUser({ ...user, hobby: newHobbies });
     } else {
-      setUser({ ...user, [name]: value });             // Handle text inputs
+      setUser({ ...user, [name]: value });    // Handle text inputs
     }
   };
 
@@ -46,12 +47,32 @@ function FeedbackForm() {
 
   let handleSubmit = (e) => {
     e.preventDefault();
-    let newList = [...list, user];
-    setList(newList);
-    localStorage.setItem('user', JSON.stringify(newList));
-    setUser({ fname: '', lname: '', email: '', phn: '', source: '', hobby: [], rate: '', feedback: '' });   // Reset the form fields after submission
+    if (editIndex !== -1) {
+      let updatedList = list.map((item, index) =>
+        index === editIndex ? user : item
+      );
+      setList(updatedList);
+      localStorage.setItem('user', JSON.stringify(updatedList));
+      setEditIndex(-1);
+    } else {
+      let newList = [...list, user];
+      setList(newList);
+      localStorage.setItem('user', JSON.stringify(newList));
+    }
+    setUser({ fname: '', lname: '', email: '', phn: '', source: '', hobby: [], rate: '', feedback: '' });  // Reset form
   };
 
+  let deleteData = (pos) => {
+    list.splice(pos, 1);
+    let newList = [...list];
+    setList(newList);
+    localStorage.setItem('user', JSON.stringify(newList));
+  };
+
+  let editData = (index) => {
+    setUser(list[index]);
+    setEditIndex(index);
+  };
 
   return (
     <>
@@ -126,12 +147,11 @@ function FeedbackForm() {
                   <BsEmojiLaughing className={`mx-2 fs-3 ${user.rateWebsite === '5' ? 'bg-primary text-dark rounded-circle' : ''}`} onClick={() => handleRating('5', 'rateWebsite')} />
                 </div>
               </div>
-
               <Form.Label>Feedback</Form.Label>
               <FloatingLabel className='mb-3'>
                 <Form.Control as="textarea" name='feedback' value={user.feedback} onChange={handleInput} style={{ height: '100px' }} />
               </FloatingLabel>
-              <Button variant="primary" type="submit" className="w-50" value={index !== -1 ? "Update" : "Submit"}>Submit</Button>
+              <Button variant="primary" type="submit" className="w-50">{editIndex !== null ? 'Update' : 'Submit'}</Button>
             </Form>
           </Col>
         </Row>
