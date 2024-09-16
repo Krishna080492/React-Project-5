@@ -71,13 +71,13 @@ function FeedbackForm() {
 
     if (!validateForm()) return;
 
-    if (editIndex !== -1) {
+    if (editIndex !== null) {
       let updatedList = list.map((item, index) =>
         index === editIndex ? user : item
       );
       setList(updatedList);
       localStorage.setItem('user', JSON.stringify(updatedList));
-      setEditIndex(-1);
+      setEditIndex(null);
     } else {
       let newList = [...list, user];
       setList(newList);
