@@ -203,7 +203,7 @@ function FeedbackForm() {
                 <td>{v.email}</td>
                 <td>{v.phn}</td>
                 <td>{v.source}</td>
-                <td>{v.hobby.join(', ')}</td>
+                <td>{(v.hobby || []).join(', ')}</td>
                 <td>{v.rateRegistration}</td>
                 <td>{v.rateWebsite}</td>
                 <td>{v.feedback}</td>
